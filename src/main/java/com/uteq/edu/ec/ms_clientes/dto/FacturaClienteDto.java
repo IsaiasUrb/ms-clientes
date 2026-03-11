@@ -1,9 +1,5 @@
 package com.uteq.edu.ec.ms_clientes.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FacturaClienteDto {
 
     private Long id;

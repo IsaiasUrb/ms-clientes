@@ -1,10 +1,12 @@
 package com.uteq.edu.ec.ms_clientes.service;
 
 import com.uteq.edu.ec.ms_clientes.dto.EntregaDto;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,21 +24,25 @@ public class EntregaService {
 
     public List<EntregaDto> obtenerEntregasPorCedula(String cedula) {
         try {
-            String cedulaLimpia = cedula == null ? "" : cedula.trim();
+            ResponseEntity<List<EntregaDto>> response = restTemplate.exchange(
+                    URL_ENTREGAS,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<EntregaDto>>() {}
+            );
 
-            EntregaDto[] response = restTemplate.getForObject(URL_ENTREGAS, EntregaDto[].class);
+            List<EntregaDto> entregas = response.getBody();
 
-            if (response == null) {
+            if (entregas == null) {
                 return Collections.emptyList();
             }
 
-            return Arrays.stream(response)
+            return entregas.stream()
                     .filter(e -> e.getClientCedula() != null)
-                    .filter(e -> e.getClientCedula().trim().equals(cedulaLimpia))
+                    .filter(e -> e.getClientCedula().trim().equals(cedula.trim()))
                     .collect(Collectors.toList());
 
         } catch (Exception e) {
-            e.printStackTrace();
             return Collections.emptyList();
         }
     }

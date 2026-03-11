@@ -1001,7 +1001,8 @@
                 limpiarFormularioCliente();
             }
 
-            cambiarTab("tab-clientes");
+            const tabActiva = "[[${tabActiva != null ? tabActiva : 'tab-clientes'}]]";
+            cambiarTab(tabActiva);
         });
     </script>
 </head>
@@ -1333,23 +1334,25 @@
                     </div>
                 </div>
 
-                <div class="section-search">
+                <form th:action="@{/clientes/web/entregas}" method="post" class="section-search">
                     <div>
                         <label class="label" for="cedulaEntrega">
                             <i class="fa-solid fa-address-card"></i> Buscar entregas por cédula
                         </label>
                         <input type="text"
-                               id="cedulaEntrega"
-                               maxlength="10"
-                               placeholder="Ingrese la cédula del cliente"
-                               onkeydown="soloNumeros(event)"
-                               onpaste="limpiarPegadoSoloNumeros(event)">
+                            id="cedulaEntrega"
+                            name="cedulaEntrega"
+                            maxlength="10"
+                            th:value="${cedulaEntrega}"
+                            placeholder="Ingrese la cédula del cliente"
+                            onkeydown="soloNumeros(event)"
+                            onpaste="limpiarPegadoSoloNumeros(event)">
                     </div>
 
-                    <button type="button" class="btn btn-search">
+                    <button type="submit" class="btn btn-search">
                         <i class="fa-solid fa-magnifying-glass"></i> Consultar Entregas
                     </button>
-                </div>
+                </form>
             </div>
 
             <div class="card table-card">
@@ -1367,20 +1370,29 @@
                     <table class="nice-table">
                         <thead>
                         <tr>
-                            <th>Order ID</th>
-                            <th>Dirección</th>
-                            <th>Estado</th>
-                            <th>Tracking</th>
+                            <th>ID Factura</th>
+                            <th>Cliente</th>
+                            <th>Cédula</th>
                             <th>Correo</th>
-                            <th>Teléfono</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
+                        <tr th:if="${facturasEncontradas == null or #lists.isEmpty(facturasEncontradas)}">
                             <td colspan="6" style="text-align:center; padding:32px 16px; color:#6b7280; font-weight:700;">
-                                <i class="fa-solid fa-truck" style="margin-right:8px; color:#10b981;"></i>
-                                Aún no hay datos cargados. Consulta una cédula para visualizar las entregas.
+                                <i class="fa-solid fa-file-circle-xmark" style="margin-right:8px; color:#10b981;"></i>
+                                Aún no hay facturas cargadas. Consulta una cédula para visualizar resultados.
                             </td>
+                        </tr>
+
+                        <tr th:each="factura : ${facturasEncontradas}">
+                            <td th:text="${factura.id}"></td>
+                            <td th:text="${factura.cliente != null ? factura.cliente.nombre : ''}"></td>
+                            <td th:text="${factura.cliente != null ? factura.cliente.dni : ''}"></td>
+                            <td th:text="${factura.cliente != null ? factura.cliente.email : ''}"></td>
+                            <td th:text="${factura.fecha}"></td>
+                            <td th:text="${factura.total}"></td>
                         </tr>
                         </tbody>
                     </table>
@@ -1402,23 +1414,25 @@
                     </div>
                 </div>
 
-                <div class="section-search">
+                <form th:action="@{/clientes/web/facturas}" method="post" class="section-search">
                     <div>
                         <label class="label" for="cedulaFactura">
                             <i class="fa-solid fa-address-card"></i> Buscar facturas por cédula
                         </label>
                         <input type="text"
-                               id="cedulaFactura"
-                               maxlength="10"
-                               placeholder="Ingrese la cédula del cliente"
-                               onkeydown="soloNumeros(event)"
-                               onpaste="limpiarPegadoSoloNumeros(event)">
+                            id="cedulaFactura"
+                            name="cedulaFactura"
+                            maxlength="10"
+                            th:value="${cedulaFactura}"
+                            placeholder="Ingrese la cédula del cliente"
+                            onkeydown="soloNumeros(event)"
+                            onpaste="limpiarPegadoSoloNumeros(event)">
                     </div>
 
-                    <button type="button" class="btn btn-search">
+                    <button type="submit" class="btn btn-search">
                         <i class="fa-solid fa-receipt"></i> Consultar Facturas
                     </button>
-                </div>
+                </form>
             </div>
 
             <div class="card table-card">
