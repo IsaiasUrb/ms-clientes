@@ -1497,23 +1497,25 @@
                     </div>
                 </div>
 
-                <div class="section-search">
+                <form th:action="@{/clientes/web/resumen}" method="post" class="section-search">
                     <div>
                         <label class="label" for="cedulaResumen">
                             <i class="fa-solid fa-id-card"></i> Consultar resumen por cédula
                         </label>
                         <input type="text"
                                id="cedulaResumen"
+                               name="cedulaResumen"
                                maxlength="10"
+                               th:value="${cedulaResumen}"
                                placeholder="Ingrese la cédula del cliente"
                                onkeydown="soloNumeros(event)"
                                onpaste="limpiarPegadoSoloNumeros(event)">
                     </div>
 
-                    <button type="button" class="btn btn-search">
+                    <button type="submit" class="btn btn-search">
                         <i class="fa-solid fa-chart-column"></i> Generar Resumen
                     </button>
-                </div>
+                </form>
             </div>
 
             <div class="stats-grid">
@@ -1524,7 +1526,8 @@
                             <i class="fa-solid fa-user"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">--</div>
+                    <div class="stat-card-value"
+                         th:text="${resumenCliente != null ? resumenCliente.nombre : '--'}">--</div>
                 </div>
 
                 <div class="stat-card">
@@ -1534,7 +1537,8 @@
                             <i class="fa-solid fa-truck"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">0</div>
+                    <div class="stat-card-value"
+                         th:text="${resumenEntregas != null ? #lists.size(resumenEntregas) : 0}">0</div>
                 </div>
 
                 <div class="stat-card">
@@ -1544,7 +1548,8 @@
                             <i class="fa-solid fa-file-invoice"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">0</div>
+                    <div class="stat-card-value"
+                         th:text="${resumenFacturas != null ? #lists.size(resumenFacturas) : 0}">0</div>
                 </div>
 
                 <div class="stat-card">
@@ -1554,7 +1559,8 @@
                             <i class="fa-solid fa-dollar-sign"></i>
                         </div>
                     </div>
-                    <div class="stat-card-value">$0.00</div>
+                    <div class="stat-card-value"
+                         th:text="${resumenMontoTotal != null ? '$' + resumenMontoTotal : '$0.00'}">$0.00</div>
                 </div>
             </div>
 
@@ -1569,24 +1575,37 @@
                         <div class="summary-list">
                             <div class="summary-list-item">
                                 <div class="summary-list-label">Cédula</div>
-                                <div class="summary-list-value">Sin consulta</div>
+                                <div class="summary-list-value"
+                                     th:text="${resumenCliente != null ? resumenCliente.cedula : 'Sin consulta'}">Sin consulta</div>
                             </div>
+
                             <div class="summary-list-item">
                                 <div class="summary-list-label">Nombre completo</div>
-                                <div class="summary-list-value">Sin consulta</div>
+                                <div class="summary-list-value"
+                                     th:text="${resumenCliente != null ? resumenCliente.nombre + ' ' + resumenCliente.apellido : 'Sin consulta'}">Sin consulta</div>
                             </div>
+
                             <div class="summary-list-item">
                                 <div class="summary-list-label">Correo</div>
-                                <div class="summary-list-value">Sin consulta</div>
+                                <div class="summary-list-value"
+                                     th:text="${resumenCliente != null ? resumenCliente.correo : 'Sin consulta'}">Sin consulta</div>
                             </div>
+
                             <div class="summary-list-item">
                                 <div class="summary-list-label">Teléfono</div>
-                                <div class="summary-list-value">Sin consulta</div>
+                                <div class="summary-list-value"
+                                     th:text="${resumenCliente != null ? resumenCliente.telefono : 'Sin consulta'}">Sin consulta</div>
                             </div>
+
                             <div class="summary-list-item">
                                 <div class="summary-list-label">Estado</div>
                                 <div class="summary-list-value">
-                                    <span class="status-chip">
+                                    <span class="status-chip" th:if="${resumenCliente != null}">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        <span th:text="${resumenCliente.estado}">ACTIVO</span>
+                                    </span>
+
+                                    <span class="status-chip" th:if="${resumenCliente == null}">
                                         <i class="fa-solid fa-circle-info"></i> Pendiente
                                     </span>
                                 </div>
@@ -1613,10 +1632,17 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
+                                <tr th:if="${resumenEntregas == null or #lists.isEmpty(resumenEntregas)}">
                                     <td colspan="4" style="text-align:center; padding:26px 16px; color:#6b7280; font-weight:700;">
                                         Aún sin resultados en resumen.
                                     </td>
+                                </tr>
+
+                                <tr th:each="entrega : ${resumenEntregas}">
+                                    <td th:text="${entrega.orderId}">0</td>
+                                    <td th:text="${entrega.trackingNumber}">TRACK</td>
+                                    <td th:text="${entrega.status}">PENDIENTE</td>
+                                    <td th:text="${entrega.address}">Dirección</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -1639,10 +1665,16 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
+                                <tr th:if="${resumenFacturas == null or #lists.isEmpty(resumenFacturas)}">
                                     <td colspan="3" style="text-align:center; padding:26px 16px; color:#6b7280; font-weight:700;">
                                         Aún sin resultados en resumen.
                                     </td>
+                                </tr>
+
+                                <tr th:each="factura : ${resumenFacturas}">
+                                    <td th:text="${factura.id}">0</td>
+                                    <td th:text="${factura.fecha}">2026-01-01</td>
+                                    <td th:text="${factura.total}">0.00</td>
                                 </tr>
                                 </tbody>
                             </table>

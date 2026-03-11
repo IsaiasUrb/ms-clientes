@@ -268,4 +268,35 @@ public class ClienteController {
 
         return "clientes";
     }
+
+    // Resunmenen del cliente con entregas y facturas
+    @PostMapping("/web/resumen")
+    public String verResumenCliente(@RequestParam String cedulaResumen, Model model) {
+
+        Cliente cliente = service.buscarPorCedula(cedulaResumen);
+        var entregas = entregaService.obtenerEntregasPorCedula(cedulaResumen);
+        var facturas = facturaService.obtenerFacturasPorCedula(cedulaResumen);
+
+        java.math.BigDecimal montoTotal = facturas.stream()
+                .map(f -> f.getTotal() != null ? f.getTotal() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+
+        model.addAttribute("cliente", new Cliente());
+        model.addAttribute("clienteEncontrado", null);
+        model.addAttribute("mensajeBusqueda", null);
+        model.addAttribute("mensajeExito", null);
+        model.addAttribute("cedulaBusqueda", "");
+        model.addAttribute("busquedaRealizada", false);
+        model.addAttribute("mostrarFormularioRegistro", false);
+        model.addAttribute("clientes", service.listarClientes());
+
+        model.addAttribute("cedulaResumen", cedulaResumen);
+        model.addAttribute("resumenCliente", cliente);
+        model.addAttribute("resumenEntregas", entregas);
+        model.addAttribute("resumenFacturas", facturas);
+        model.addAttribute("resumenMontoTotal", montoTotal);
+        model.addAttribute("tabActiva", "tab-resumen");
+
+        return "clientes";
+    }
 }
