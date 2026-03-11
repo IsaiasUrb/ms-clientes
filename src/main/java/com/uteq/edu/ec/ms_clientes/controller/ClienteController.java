@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.uteq.edu.ec.ms_clientes.service.EntregaService; // nuevo para el msentregas
+import com.uteq.edu.ec.ms_clientes.service.FacturaService; // nuevo para el msfacturas
 
 @Controller
 @RequestMapping("/clientes")
@@ -14,10 +15,12 @@ public class ClienteController {
 
     private final ClienteService service;
     private final EntregaService entregaService; // nuevo para el msentregas
+    private final FacturaService facturaService; // nuevo para el msfacturas
 
-    public ClienteController(ClienteService service, EntregaService entregaService) {
+    public ClienteController(ClienteService service, EntregaService entregaService, FacturaService facturaService) {
         this.service = service;
         this.entregaService = entregaService; // nuevo para el msentregas
+        this.facturaService = facturaService; // nuevo para el msfacturas
     }
 
     // ======================
@@ -220,7 +223,7 @@ public class ClienteController {
         return "redirect:/clientes/web";
     }
 
-        // postman para obtener las entregas por cédula desde el msentregas
+        // postman o método para obtener las entregas por cédula desde el msentregas
     @PostMapping("/web/entregas")
     public String buscarEntregasPorCedula(@RequestParam String cedulaEntrega, Model model) {
         model.addAttribute("cliente", new Cliente());
@@ -235,6 +238,24 @@ public class ClienteController {
         model.addAttribute("entregasEncontradas", entregaService.obtenerEntregasPorCedula(cedulaEntrega));
         model.addAttribute("cedulaEntrega", cedulaEntrega);
         model.addAttribute("tabActiva", "tab-entregas");
+
+        return "clientes";
+    }
+
+    // postman o método para obtener las facturas por cédula desde el msfacturas    @PostMapping("/web/facturas")
+    public String buscarFacturasPorCedula(@RequestParam String cedulaFactura, Model model) {
+        model.addAttribute("cliente", new Cliente());
+        model.addAttribute("clienteEncontrado", null);
+        model.addAttribute("mensajeBusqueda", null);
+        model.addAttribute("mensajeExito", null);
+        model.addAttribute("cedulaBusqueda", "");
+        model.addAttribute("busquedaRealizada", false);
+        model.addAttribute("mostrarFormularioRegistro", false);
+        model.addAttribute("clientes", service.listarClientes());
+
+        model.addAttribute("facturasEncontradas", facturaService.obtenerFacturasPorCedula(cedulaFactura));
+        model.addAttribute("cedulaFactura", cedulaFactura);
+        model.addAttribute("tabActiva", "tab-facturas");
 
         return "clientes";
     }
