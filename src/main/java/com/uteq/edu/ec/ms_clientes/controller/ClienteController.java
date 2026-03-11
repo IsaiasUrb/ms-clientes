@@ -9,6 +9,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.uteq.edu.ec.ms_clientes.service.EntregaService; // nuevo para el msentregas
 import com.uteq.edu.ec.ms_clientes.service.FacturaService; // nuevo para el msfacturas
 
+import java.math.BigDecimal;    // nuevo para el resumen clientes
+import java.util.List; // nuevo para el resumen clientes
+
 @Controller
 @RequestMapping("/clientes")
 public class ClienteController {
@@ -264,6 +267,40 @@ public class ClienteController {
 
         model.addAttribute("cedulaFactura", cedulaFactura);
         model.addAttribute("tabActiva", "tab-facturas");
+
+        return "clientes";
+    }
+    // ======================
+    // RESUMEN CLIENTE
+    // ======================
+    @PostMapping("/web/resumen")
+    public String verResumenCliente(@RequestParam String cedulaResumen, Model model) {
+
+        Cliente clienteEncontrado = service.buscarPorCedula(cedulaResumen);
+        var entregas = entregaService.obtenerEntregasPorCedula(cedulaResumen);
+        var facturas = facturaService.obtenerFacturasPorCedula(cedulaResumen);
+
+        BigDecimal montoTotal = facturas.stream()
+                .map(f -> f.getTotal() != null ? f.getTotal() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("cliente", new Cliente());
+        model.addAttribute("clienteEncontrado", null);
+        model.addAttribute("mensajeBusqueda", null);
+        model.addAttribute("mensajeExito", null);
+        model.addAttribute("cedulaBusqueda", "");
+        model.addAttribute("busquedaRealizada", false);
+        model.addAttribute("mostrarFormularioRegistro", false);
+        model.addAttribute("clientes", service.listarClientes());
+
+        model.addAttribute("resumenCliente", clienteEncontrado);
+        model.addAttribute("resumenEntregas", entregas);
+        model.addAttribute("resumenFacturas", facturas);
+        model.addAttribute("cedulaResumen", cedulaResumen);
+        model.addAttribute("totalEntregas", entregas.size());
+        model.addAttribute("totalFacturas", facturas.size());
+        model.addAttribute("montoTotalFacturado", montoTotal);
+        model.addAttribute("tabActiva", "tab-resumen");
 
         return "clientes";
     }
