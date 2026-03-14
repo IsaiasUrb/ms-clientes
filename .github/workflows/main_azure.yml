@@ -37,10 +37,12 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AZURE_IP }}
-          username: azureuserhv
+          username: ${{ secrets.AZURE_USER }}
           key: ${{ secrets.AZURE_SSH_KEY }}
           script: |
             cd ~/proyecto-azure
             docker compose down --remove-orphans
             docker compose pull
             docker compose up -d
+            docker compose ps
+            docker logs ms-clientes-nuevo --tail 50

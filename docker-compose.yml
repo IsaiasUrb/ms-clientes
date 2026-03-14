@@ -6,11 +6,11 @@ services:
     container_name: postgres
     environment:
       POSTGRES_DB: msclientes
-      POSTGRES_USER: Harolito
+      POSTGRES_USER: Isaias
       POSTGRES_PASSWORD: 1234
       TZ: America/Guayaquil
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
@@ -18,16 +18,13 @@ services:
     restart: always
 
   ms-clientes:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: ms-clientes:local
+    image: isaiasurb/ms-clientes:latest
     container_name: ms-clientes
     ports:
-      - "8081:8081"
+      - "8089:8081"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/msclientes
-      SPRING_DATASOURCE_USERNAME: Harolito
+      SPRING_DATASOURCE_USERNAME: Isaias
       SPRING_DATASOURCE_PASSWORD: 1234
     depends_on:
       - postgres
