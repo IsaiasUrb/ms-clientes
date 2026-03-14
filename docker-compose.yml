@@ -18,7 +18,7 @@ services:
     restart: always
 
   ms-clientes:
-    image: isaiasurb/ms-clientes:latest
+    image: isaiasurb/ms-clientes-nuevo:latest
     container_name: ms-clientes
     ports:
       - "8089:8081"
